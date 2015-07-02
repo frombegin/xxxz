@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import team.models
 from django.conf import settings
 
 
@@ -23,6 +24,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('role', models.IntegerField(default=0, choices=[(0, b'member'), (1, b'manager'), (2, b'owner')])),
+                ('status', models.IntegerField(default=0, choices=[(0, b'appled'), (1, b'invited'), (2, b'declined'), (3, b'rejected'), (4, b'accepted'), (5, b'auto_joined')])),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
         ),
@@ -33,6 +35,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=128)),
                 ('description', models.TextField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('avatar', models.ImageField(upload_to=team.models.avatar_upload, blank=True)),
                 ('creator', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
         ),

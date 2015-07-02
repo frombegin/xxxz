@@ -4,4 +4,4 @@
 from django.dispatch import Signal
 
 
-# your_signal = Signal(providing_args=["xxx"])
+member_added = Signal(providing_args=["membership"])

@@ -16,3 +16,37 @@ from django.contrib import admin
 ##
 ### Register your models here.
 ##admin.site.register(YourModel, YourModelAdmin)
+
+
+from django.contrib import admin
+from .models import Team, Membership
+
+
+def members_count(obj):
+    return obj.members.count()
+
+
+members_count.short_description = "Members Count"
+
+
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ("name", members_count, "creator",)
+    fields = (
+        'name',
+        'description',
+        'avatar',
+        'creator',
+        'private',
+    )
+    raw_id_fields = ("creator",)
+
+
+class MembershipAdmin(admin.ModelAdmin):
+    raw_id_fields = ["user"]
+    list_display = ["team", "user", "status", "role"]
+    list_filter = ["team"]
+    search_fields = ["user__username"]
+
+
+admin.site.register(Team, TeamAdmin)
+admin.site.register(Membership, MembershipAdmin)
