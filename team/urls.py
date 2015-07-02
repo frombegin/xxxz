@@ -16,5 +16,5 @@ urlpatterns = [
     ## --------------------------------------------------
     ## url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^object/', name='list')
+    # url(r'^$', name='list')
 ]

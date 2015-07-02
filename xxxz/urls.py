@@ -17,5 +17,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
+	url(r'^team/', include('team.urls', namespace='team', app_name='team')),
     url(r'^admin/', include(admin.site.urls)),
 ]
