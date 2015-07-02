@@ -19,7 +19,7 @@ from django.contrib import admin
 
 
 from django.contrib import admin
-from .models import Team, Membership
+from .models import Team, Member
 
 
 def members_count(obj):
@@ -41,7 +41,7 @@ class TeamAdmin(admin.ModelAdmin):
     raw_id_fields = ("creator",)
 
 
-class MembershipAdmin(admin.ModelAdmin):
+class MemberAdmin(admin.ModelAdmin):
     raw_id_fields = ["user"]
     list_display = ["team", "user", "status", "role"]
     list_filter = ["team"]
@@ -49,4 +49,4 @@ class MembershipAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Team, TeamAdmin)
-admin.site.register(Membership, MembershipAdmin)
+admin.site.register(Member, MemberAdmin)

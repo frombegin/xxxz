@@ -24,7 +24,7 @@ class TeamManager(models.Manager):
     def create_team(self, user, **kwargs):
         kwargs['creator'] = user
         team = self.create(**kwargs)
-        team.add_user(user, Membership.Role.OWNER)  # add owner as membership
+        team.add_user(user, Member.Role.OWNER)  # add owner as membership
         return team
 
 
@@ -56,21 +56,21 @@ class Team(models.Model):
     def is_manager(self, user):
 
         member = self.get_member_by_user(user)
-        return member.role == Membership.Role.MANAGER if member else False
+        return member.role == Member.Role.MANAGER if member else False
 
     def is_owner(self, user):
         member = self.get_member_by_user(user)
-        return member.role == Membership.Role.OWNER if member else False
+        return member.role == Member.Role.OWNER if member else False
 
     def is_owner_or_manager(self, user):
         member = self.get_member_by_user(user)
-        return member.role in (Membership.Role.OWNER, Membership.Role.MANAGER,) if member else False
+        return member.role in (Member.Role.OWNER, Member.Role.MANAGER,) if member else False
 
     def is_on_team(self, user):
         pass
 
     def add_user(self, user, role):
-        status = Membership.Status.INVITED if self.private else Membership.Status.AUTO_JOINED
+        status = Member.Status.INVITED if self.private else Member.Status.AUTO_JOINED
         member, _ = self.members.get_or_create(
             user=user,
             defaults={"role": role, "status": status}
@@ -81,7 +81,7 @@ class Team(models.Model):
     def get_member_by_user(self, user):
         try:
             return self.members.get(user=user)
-        except Membership.DoesNotExist:
+        except Member.DoesNotExist:
             return None
 
     def __unicode__(self):
@@ -115,7 +115,7 @@ class Invitation(models.Model):
         unique_together = ('inviter', 'invitee', 'team',)
 
 
-class Membership(models.Model):
+class Member(models.Model):
     class Role:
         MEMBER, MANAGER, OWNER = range(3)
         CHOICES = (

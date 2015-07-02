@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Membership',
+            name='Member',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('role', models.IntegerField(default=0, choices=[(0, b'member'), (1, b'manager'), (2, b'owner')])),
@@ -50,16 +50,16 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('avatar', models.ImageField(upload_to=team.models.avatar_upload, blank=True)),
                 ('private', models.BooleanField(default=False)),
-                ('creator', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('creator', models.ForeignKey(related_name='teams', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(
-            model_name='membership',
+            model_name='member',
             name='team',
             field=models.ForeignKey(related_name='members', to='team.Team'),
         ),
         migrations.AddField(
-            model_name='membership',
+            model_name='member',
             name='user',
             field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
         ),

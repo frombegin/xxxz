@@ -3,7 +3,7 @@
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from team.models import Team, Invitation, Membership, avatar_upload
+from team.models import Team, Invitation, Member, avatar_upload
 
 
 class BaseTestCase(TestCase):
@@ -21,18 +21,20 @@ class BaseTestCase(TestCase):
 
 class TeamTestCase(BaseTestCase):
     def test_create_team(self):
-        team = Team.objects.create_team(self.user, name=u'NON-piravte team')
+        temp_user = User.objects.create_user('temp', 'temp@email.com', '123456')
+        team = Team.objects.create_team(temp_user, name=u'NON-piravte team')
         self.assertFalse(team.private)
-        self.assertEqual(self.user.teams.count(), 2)
-        self.assertTrue(team.is_owner(self.user))
+        self.assertEqual(temp_user.teams.count(), 1)
+        self.assertTrue(team.is_owner(temp_user))
+        self.assertEqual(team.members.count(), 1)
 
     def test_add_member(self):
-        member = self.team.add_user(self.u1, Membership.Role.MEMBER)
-        self.assertEquals(member.role, Membership.Role.MEMBER)
-        self.assertEquals(member.status, Membership.Status.AUTO_JOINED)
+        member = self.team.add_user(self.u1, Member.Role.MEMBER)
+        self.assertEquals(member.role, Member.Role.MEMBER)
+        self.assertEquals(member.status, Member.Status.AUTO_JOINED)
 
-        self.team.add_user(self.u2, Membership.Role.MEMBER)
-        self.team.add_user(self.u3, Membership.Role.MANAGER)
+        self.team.add_user(self.u2, Member.Role.MEMBER)
+        self.team.add_user(self.u3, Member.Role.MANAGER)
 
 
 class MembershipTestCase(BaseTestCase):
@@ -42,16 +44,16 @@ class MembershipTestCase(BaseTestCase):
         self.assertTrue(path.endswith(".jpg"))
 
     def test_membership_create(self):
-        member = Membership.objects.create(team=self.team, user=self.user)
+        member = Member.objects.create(team=self.team, user=self.user)
         self.assertEquals(self.team.members.count(), 1)
-        self.assertEquals(member.role, Membership.Role.MEMBER)
+        self.assertEquals(member.role, Member.Role.MEMBER)
 
-        member = Membership.objects.create(team=self.team, user=self.user, role=Membership.Role.MANAGER)
+        member = Member.objects.create(team=self.team, user=self.user, role=Member.Role.MANAGER)
         self.assertEquals(self.team.members.count(), 2)
-        self.assertEquals(member.role, Membership.Role.MANAGER)
+        self.assertEquals(member.role, Member.Role.MANAGER)
 
         member.delete()
         self.assertEquals(self.team.members.count(), 1)
 
     def test_membership_status(self):
-        member = Membership.objects.create(team=self.team, user=self.user)
+        member = Member.objects.create(team=self.team, user=self.user)
