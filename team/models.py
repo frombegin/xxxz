@@ -21,24 +21,25 @@ def avatar_upload(instance, filename):
 
 
 class TeamManager(models.Manager):
-    ''
+    def create_team(self, user, **kwargs):
+        kwargs['creator'] = user
+        team = self.create(**kwargs)
+        team.add_user(user, Membership.Role.OWNER)  # add owner as membership
+        return team
 
 
 class Team(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='teams')
     created_at = models.DateTimeField(auto_now_add=True)
     avatar = models.ImageField(upload_to=avatar_upload, blank=True)
     private = models.BooleanField(default=False)
 
-    objects = TeamManager
+    objects = TeamManager()
 
     def get_absolute_url(self):
         return reverse(TEAM_URL_DETAIL_NAME, args=[self.pk])
-
-    def open_for_joining(self):
-        return not self.private
 
     def can_join(self, user):
         pass
@@ -53,13 +54,17 @@ class Team(models.Model):
         return self.members.filter(user=user).exists()
 
     def is_manager(self, user):
-        pass
+
+        member = self.get_member_by_user(user)
+        return member.role == Membership.Role.MANAGER if member else False
 
     def is_owner(self, user):
-        pass
+        member = self.get_member_by_user(user)
+        return member.role == Membership.Role.OWNER if member else False
 
     def is_owner_or_manager(self, user):
-        pass
+        member = self.get_member_by_user(user)
+        return member.role in (Membership.Role.OWNER, Membership.Role.MANAGER,) if member else False
 
     def is_on_team(self, user):
         pass
@@ -73,9 +78,9 @@ class Team(models.Model):
         signals.member_added.send(sender=self, membership=member)
         return member
 
-    def get_membership_for_user(self, user):
+    def get_member_by_user(self, user):
         try:
-            return self.memberships.get(user=user)
+            return self.members.get(user=user)
         except Membership.DoesNotExist:
             return None
 

@@ -20,10 +20,11 @@ class BaseTestCase(TestCase):
 
 
 class TeamTestCase(BaseTestCase):
-    def test_joinable(self):
-        team = Team.objects.create(creator=self.user, name=u'NON-piravte team')
+    def test_create_team(self):
+        team = Team.objects.create_team(self.user, name=u'NON-piravte team')
         self.assertFalse(team.private)
-        self.assertTrue(team.open_for_joining())
+        self.assertEqual(self.user.teams.count(), 2)
+        self.assertTrue(team.is_owner(self.user))
 
     def test_add_member(self):
         member = self.team.add_user(self.u1, Membership.Role.MEMBER)
