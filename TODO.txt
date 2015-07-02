@@ -1,0 +1,12 @@
+TODO: team-activity, team-member, team-invitation => team-base(team_id, created_at)
+TODO: add more model-tests
+TODO: user.teams should also has joined teams, change this: team.creator(releated_name='teams')
+
+class Member(models.Model):
+    user = ForeignKey(...)
+    team = ForeignKey(...)
+    role = role
+
+user.created_teams -> Member.objects.filter(user = user, role=OWNER)
+user.joined_teams -> Member.objects.filter(user = user, role!=OWNER)
+user.teams -> Member.objects.filter(user = user)

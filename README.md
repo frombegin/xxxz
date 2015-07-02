@@ -1,3 +1,3 @@
 # xxxz project
 
-TODO: add later.
+a django project
