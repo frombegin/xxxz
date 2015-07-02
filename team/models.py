@@ -10,7 +10,6 @@ import uuid
 
 from . import signals
 
-
 TEAM_AVATAR_PATH = "avatars"
 TEAM_URL_DETAIL_NAME = "team:detail"
 
@@ -84,8 +83,31 @@ class Team(models.Model):
         return self.name
 
 
+class TeamItem(models.Model):
+    class Meta:
+        abstract = True
+
+
+class Activity(models.Model):
+    team = models.ForeignKey(Team)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    text = models.CharField(max_length=128, )
+    uri = models.CharField(max_length=128, )
+
+    def __unicode__(self):
+        return u'%s (%s)' % (self.text, self.uri)
+
+
 class Invitation(models.Model):
-    pass
+    inviter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='inviter')
+    invitee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='invitee')
+    created_at = models.DateTimeField(auto_now_add=True)
+    team = models.ForeignKey(Team)
+
+    class Meta:
+        unique_together = ('inviter', 'invitee', 'team',)
 
 
 class Membership(models.Model):
@@ -98,11 +120,10 @@ class Membership(models.Model):
         )
 
     class Status:
-        APPLIED, INVITED, DECLINED, REJECTED, ACCEPTED, AUTO_JOINED = range(6)
+        APPLIED, INVITED, REJECTED, ACCEPTED, AUTO_JOINED = range(5)
         CHOICES = (
             (APPLIED, 'appled'),
             (INVITED, 'invited'),
-            (DECLINED, 'declined'),
             (REJECTED, 'rejected'),
             (ACCEPTED, 'accepted'),
             (AUTO_JOINED, 'auto_joined'),
