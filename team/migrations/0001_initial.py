@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
             name='Invitation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('text', models.CharField(max_length=128)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('invitee', models.ForeignKey(related_name='invitee', to=settings.AUTH_USER_MODEL)),
                 ('inviter', models.ForeignKey(related_name='inviter', to=settings.AUTH_USER_MODEL)),

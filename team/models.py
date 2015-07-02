@@ -108,6 +108,7 @@ class Activity(models.Model):
 class Invitation(models.Model):
     inviter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='inviter')
     invitee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='invitee')
+    text = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
     team = models.ForeignKey(Team)
 
