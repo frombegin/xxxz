@@ -10,6 +10,7 @@ import uuid
 
 from . import signals
 
+
 TEAM_AVATAR_PATH = "avatars"
 TEAM_URL_DETAIL_NAME = "team:detail"
 
@@ -24,7 +25,7 @@ class TeamManager(models.Manager):
     def create_team(self, user, **kwargs):
         kwargs['creator'] = user
         team = self.create(**kwargs)
-        team.add_user(user, Member.Role.OWNER)  # add owner as membership
+        team.add_member(user, Member.Role.OWNER)  # add owner as membership
         return team
 
 
@@ -54,7 +55,6 @@ class Team(models.Model):
         return self.members.filter(user=user).exists()
 
     def is_manager(self, user):
-
         member = self.get_member_by_user(user)
         return member.role == Member.Role.MANAGER if member else False
 
@@ -69,7 +69,7 @@ class Team(models.Model):
     def is_on_team(self, user):
         pass
 
-    def add_user(self, user, role):
+    def add_member(self, user, role):
         status = Member.Status.INVITED if self.private else Member.Status.AUTO_JOINED
         member, _ = self.members.get_or_create(
             user=user,
@@ -77,6 +77,9 @@ class Team(models.Model):
         )
         signals.member_added.send(sender=self, membership=member)
         return member
+
+    def add_activity(self, user, text, uri=u''):
+        return Activity.objects.create(team=self, creator=user, text=text, uri=uri)
 
     def get_member_by_user(self, user):
         try:
@@ -94,12 +97,12 @@ class TeamItem(models.Model):
 
 
 class Activity(models.Model):
-    team = models.ForeignKey(Team)
+    team = models.ForeignKey(Team, related_name='activities')
     creator = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_at = models.DateTimeField(auto_now_add=True)
 
     text = models.CharField(max_length=128, )
-    uri = models.CharField(max_length=128, )
+    uri = models.CharField(max_length=128, blank=True)
 
     def __unicode__(self):
         return u'%s (%s)' % (self.text, self.uri)

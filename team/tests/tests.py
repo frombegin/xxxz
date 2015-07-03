@@ -3,7 +3,7 @@
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from team.models import Team, Invitation, Member, avatar_upload
+from team.models import Team, Invitation, Member, avatar_upload, Activity
 
 
 class BaseTestCase(TestCase):
@@ -19,6 +19,19 @@ class BaseTestCase(TestCase):
         self.team.delete()
 
 
+class ActivityTestCase(BaseTestCase):
+    def test_activities(self):
+        temp_user = User.objects.create_user('temp', 'temp@email.com', '123456')
+        team = Team.objects.create_team(temp_user, name=u'NON-piravte team')
+
+        Activity.objects.create(team=team, creator=temp_user, text="hello", uri="uri")
+        self.assertEquals(1, team.activities.count())
+
+        act = team.add_activity(temp_user, "hello")
+        self.assertEquals(2, team.activities.count())
+        self.assertEquals(act.team_id, team.id)
+
+
 class TeamTestCase(BaseTestCase):
     def test_create_team(self):
         temp_user = User.objects.create_user('temp', 'temp@email.com', '123456')
@@ -29,12 +42,12 @@ class TeamTestCase(BaseTestCase):
         self.assertEqual(team.members.count(), 1)
 
     def test_add_member(self):
-        member = self.team.add_user(self.u1, Member.Role.MEMBER)
+        member = self.team.add_member(self.u1, Member.Role.MEMBER)
         self.assertEquals(member.role, Member.Role.MEMBER)
         self.assertEquals(member.status, Member.Status.AUTO_JOINED)
 
-        self.team.add_user(self.u2, Member.Role.MEMBER)
-        self.team.add_user(self.u3, Member.Role.MANAGER)
+        self.team.add_member(self.u2, Member.Role.MEMBER)
+        self.team.add_member(self.u3, Member.Role.MANAGER)
 
 
 class MembershipTestCase(BaseTestCase):

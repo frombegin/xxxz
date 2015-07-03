@@ -1,0 +1,28 @@
+team
+	visible
+	members
+		owner
+		managers,
+		members
+	invitations
+		user: accept, reject
+	applications
+		manager: accept, reject
+	blacklist
+	activities
+	items...
+	
+
+
+hall
+	search()
+	teams(popular, newest, category)
+
+
+
+user
+	followers
+	followings
+	teams
+	team-blacklist
+		team-id, ...
